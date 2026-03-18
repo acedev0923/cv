@@ -1,4 +1,4 @@
-import puppeteer from "puppeteer";
+import puppeteer, { type Browser } from "puppeteer-core";
 
 const FULL_HTML_TEMPLATE = (bodyHtml: string) => `<!DOCTYPE html>
 <html>
@@ -32,11 +32,26 @@ const FULL_HTML_TEMPLATE = (bodyHtml: string) => `<!DOCTYPE html>
 <body>${bodyHtml}</body>
 </html>`;
 
-export async function renderPdf(bodyHtml: string): Promise<Buffer> {
-  const browser = await puppeteer.launch({
+async function launchBrowser(): Promise<Browser> {
+  if (process.env.VERCEL) {
+    const chromium = (await import("@sparticuz/chromium")).default;
+    return puppeteer.launch({
+      args: chromium.args,
+      executablePath: await chromium.executablePath(),
+      headless: true as boolean,
+    });
+  }
+
+  // Local development: use full puppeteer's bundled Chrome
+  const localPuppeteer = (await import("puppeteer")).default;
+  return localPuppeteer.launch({
     headless: true,
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
-  });
+  }) as unknown as Browser;
+}
+
+export async function renderPdf(bodyHtml: string): Promise<Buffer> {
+  const browser = await launchBrowser();
 
   try {
     const page = await browser.newPage();
