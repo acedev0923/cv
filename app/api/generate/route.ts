@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTemplateSkills, getTemplateText } from "@/lib/templateReader";
 import { selectTemplate, generateCVHtml, extractJobInfo, TokenUsage } from "@/lib/aiGenerator";
-import { renderPdf } from "@/lib/pdfRenderer";
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,7 +26,6 @@ export async function POST(req: NextRequest) {
 
     const cvText = await getTemplateText(templateResult.skill);
     const cvResult = await generateCVHtml(cvText, trimmed);
-    const pdfBuffer = await renderPdf(cvResult.html);
 
     const totalCost =
       templateResult.usage.cost + cvResult.usage.cost + jobInfoResult.usage.cost;
@@ -37,7 +35,7 @@ export async function POST(req: NextRequest) {
       templateResult.usage.outputTokens + cvResult.usage.outputTokens + jobInfoResult.usage.outputTokens;
 
     return NextResponse.json({
-      pdf: Buffer.from(pdfBuffer).toString("base64"),
+      html: cvResult.html,
       templateSkill: templateResult.skill,
       jobInfo: jobInfoResult.jobInfo,
       usage: {

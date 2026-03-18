@@ -23,6 +23,34 @@ function locationMatches(jobLocation: string): boolean {
   return keywords.some((k) => job.includes(k));
 }
 
+async function htmlToPdfBlob(html: string): Promise<Blob> {
+  const html2pdf = (await import("html2pdf.js")).default;
+
+  const container = document.createElement("div");
+  container.innerHTML = html;
+  container.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
+  container.style.fontSize = "11pt";
+  container.style.lineHeight = "1.5";
+  container.style.color = "#222";
+  document.body.appendChild(container);
+
+  try {
+    const blob: Blob = await html2pdf()
+      .set({
+        margin: [20, 18, 20, 18],
+        filename: "tailored-cv.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      })
+      .from(container)
+      .outputPdf("blob");
+    return blob;
+  } finally {
+    document.body.removeChild(container);
+  }
+}
+
 export default function Home() {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -56,8 +84,7 @@ export default function Home() {
       setJobInfo(data.jobInfo);
       setUsage(data.usage);
 
-      const byteArray = Uint8Array.from(atob(data.pdf), (c) => c.charCodeAt(0));
-      const blob = new Blob([byteArray], { type: "application/pdf" });
+      const blob = await htmlToPdfBlob(data.html);
       setPdfUrl(URL.createObjectURL(blob));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
