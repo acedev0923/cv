@@ -23,15 +23,43 @@ function locationMatches(jobLocation: string): boolean {
   return keywords.some((k) => job.includes(k));
 }
 
+const CV_STYLES = `
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .cv-root {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #222;
+  }
+  .cv-root h1 { font-size: 20pt; margin-bottom: 4px; color: #1a1a1a; }
+  .cv-root h2 {
+    font-size: 13pt;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    color: #2c3e50;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 2px;
+  }
+  .cv-root p { margin-bottom: 6px; }
+  .cv-root ul { margin-left: 18px; margin-bottom: 8px; }
+  .cv-root li { margin-bottom: 3px; }
+  .cv-root strong { color: #1a1a1a; }
+  .cv-root a { color: #2c3e50; text-decoration: none; }
+`;
+
 async function htmlToPdfBlob(html: string): Promise<Blob> {
   const html2pdf = (await import("html2pdf.js")).default;
 
   const container = document.createElement("div");
-  container.innerHTML = html;
-  container.style.fontFamily = "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif";
-  container.style.fontSize = "11pt";
-  container.style.lineHeight = "1.5";
-  container.style.color = "#222";
+  const style = document.createElement("style");
+  style.textContent = CV_STYLES;
+  container.appendChild(style);
+
+  const content = document.createElement("div");
+  content.className = "cv-root";
+  content.innerHTML = html;
+  container.appendChild(content);
+
   document.body.appendChild(container);
 
   try {
