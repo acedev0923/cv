@@ -44,7 +44,7 @@ RULES:
 - IMPORTANT: Update the end date of the most recent work experience to "${lastMonth}" to show the candidate is currently employed up to last month.
 - Output clean, semantic HTML suitable for PDF rendering. Use a single-column layout.
 - Use standard HTML tags: h1, h2, p, ul, li, strong, em. No tables, no columns, no images.
-- List skills as comma-separated text (ATS-friendly), not as tags or badges.
+- For the Skills section, preserve the same category groupings as the sample CV (e.g. "Frontend:", "Backend:", "Database:", "DevOps:", etc.). List each category on its own line with its skills as comma-separated text. Do NOT merge all skills into a single flat list.
 - Target 1-2 pages when printed on A4.
 - Include these sections in order: Name & Contact, Professional Summary, Skills, Work Experience, Education, Certifications (if any).
 - Use concise bullet points for achievements. Start with action verbs.
