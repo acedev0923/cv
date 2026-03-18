@@ -1,7 +1,8 @@
 import fs from "fs";
 import path from "path";
+// Import inner module directly to avoid pdf-parse's broken debug auto-run
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse = require("pdf-parse");
+const pdfParse = require("pdf-parse/lib/pdf-parse.js");
 import mammoth from "mammoth";
 
 export async function extractText(filePath: string): Promise<string> {
